@@ -1,0 +1,9 @@
+{
+  "name": "kids-zone",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Build-free Safari web app for kids chores and mini games.",
+  "scripts": {
+    "watch:serve": "python -m http.server 8000"
+  }
+}
