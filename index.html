@@ -6,18 +6,47 @@
     <title>Kids Zone</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="msdos">
     <header class="header">
       <div>
-        <h1>Kids Zone</h1>
-        <p class="subtitle">Turn-based chores, fair scoring, and mini games.</p>
+        <p class="title">KIDS ZONE</p>
+        <p class="subtitle">Pixel Quest Board · 90s DOS vibes</p>
       </div>
-      <button id="reset-data" class="ghost">Reset Data</button>
+      <div class="status-panel">
+        <div class="status-row">
+          <span class="status-label">DAY</span>
+          <strong id="today-label" class="status-value">---</strong>
+        </div>
+        <button id="reset-data" class="ghost">Reset Data</button>
+      </div>
     </header>
 
-    <main class="grid">
-      <section class="card" aria-labelledby="profiles-title">
-        <h2 id="profiles-title">1) Create Profiles</h2>
+    <main>
+      <section id="home-screen" class="screen is-active">
+        <div class="home-grid">
+          <nav class="menu-panel" aria-label="Main menu">
+            <h2>MAIN MENU</h2>
+            <button type="button" data-screen-target="profiles-screen">Player Lab</button>
+            <button type="button" data-screen-target="chores-screen">Chore Console</button>
+            <button type="button" data-screen-target="typing-screen">Typing Trainer</button>
+            <button type="button" data-screen-target="ai-screen">AI Helper</button>
+          </nav>
+
+          <section class="score-panel" aria-labelledby="scoreboard-title">
+            <div class="panel-header">
+              <h2 id="scoreboard-title">TODAY'S QUEST BOARD</h2>
+              <p class="helper">Quick view of what is due and already cleared.</p>
+            </div>
+            <div id="scoreboard" class="quest-board"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="profiles-screen" class="screen" aria-labelledby="profiles-title">
+        <div class="screen-header">
+          <h2 id="profiles-title">Player Lab</h2>
+          <button type="button" class="ghost" data-screen-target="home-screen">Back to Main Menu</button>
+        </div>
         <form id="profile-form" class="stack">
           <label>
             Name
@@ -36,8 +65,11 @@
         <div id="players-list" class="list"></div>
       </section>
 
-      <section class="card" aria-labelledby="turns-title">
-        <h2 id="turns-title">2) Turn + Chore Report</h2>
+      <section id="chores-screen" class="screen" aria-labelledby="turns-title">
+        <div class="screen-header">
+          <h2 id="turns-title">Chore Console</h2>
+          <button type="button" class="ghost" data-screen-target="home-screen">Back to Main Menu</button>
+        </div>
         <div class="turn-panel">
           <div>
             <p class="label">Current Turn</p>
@@ -51,26 +83,28 @@
             <select name="player" id="chore-player"></select>
           </label>
           <label>
-            Chore Completed
-            <input type="text" name="chore" required placeholder="Put away toys" />
+            Quest
+            <select name="task" id="chore-task"></select>
+          </label>
+          <label>
+            Note (optional)
+            <input type="text" name="note" placeholder="Put away toys" />
           </label>
           <label>
             Complexity
             <input type="range" name="complexity" min="1" max="5" value="3" />
           </label>
-          <button type="submit">Log Chore</button>
+          <button type="submit">Log Quest</button>
           <p class="helper" id="score-preview"></p>
         </form>
-      </section>
-
-      <section class="card" aria-labelledby="scores-title">
-        <h2 id="scores-title">Scoreboard</h2>
-        <div id="scoreboard" class="scoreboard"></div>
         <div class="history" id="history"></div>
       </section>
 
-      <section class="card" aria-labelledby="typing-title">
-        <h2 id="typing-title">Typing Trainer</h2>
+      <section id="typing-screen" class="screen" aria-labelledby="typing-title">
+        <div class="screen-header">
+          <h2 id="typing-title">Typing Trainer</h2>
+          <button type="button" class="ghost" data-screen-target="home-screen">Back to Main Menu</button>
+        </div>
         <p class="helper">Type the prompt exactly, then submit to earn points.</p>
         <div id="typing-prompt" class="prompt"></div>
         <form id="typing-form" class="stack">
@@ -81,8 +115,11 @@
         <div id="typing-result" class="result"></div>
       </section>
 
-      <section class="card" aria-labelledby="ai-title">
-        <h2 id="ai-title">AI Helper (Optional)</h2>
+      <section id="ai-screen" class="screen" aria-labelledby="ai-title">
+        <div class="screen-header">
+          <h2 id="ai-title">AI Helper (Optional)</h2>
+          <button type="button" class="ghost" data-screen-target="home-screen">Back to Main Menu</button>
+        </div>
         <p class="helper">Add your OpenRouter API key for encouragement and ideas. Stored only on this device.</p>
         <form id="ai-settings" class="stack">
           <label>

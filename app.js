@@ -4,6 +4,33 @@ const defaultState = {
   players: [],
   currentTurnIndex: 0,
   history: [],
+  taskLogs: [],
+  tasks: [
+    {
+      id: "task-bed",
+      title: "Make bed + tidy room",
+      category: "Home Base",
+      days: [true, true, true, true, true, true, true],
+    },
+    {
+      id: "task-snack",
+      title: "Healthy snack helper",
+      category: "Home Base",
+      days: [true, true, true, true, true, false, false],
+    },
+    {
+      id: "task-reading",
+      title: "Reading power-up",
+      category: "Brain Boost",
+      days: [true, true, true, true, true, false, false],
+    },
+    {
+      id: "task-outdoor",
+      title: "Outdoor stretch",
+      category: "Body Boost",
+      days: [false, false, true, false, true, true, true],
+    },
+  ],
   ai: {
     apiKey: "",
     model: "openai/gpt-4o-mini",
@@ -18,6 +45,8 @@ const typingPrompts = [
   "Practice makes me stronger every day.",
 ];
 
+const dayLabels = ["M", "T", "W", "T", "F", "S", "S"];
+
 const elements = {
   profileForm: document.getElementById("profile-form"),
   playersList: document.getElementById("players-list"),
@@ -25,6 +54,7 @@ const elements = {
   nextTurnButton: document.getElementById("next-turn"),
   choreForm: document.getElementById("chore-form"),
   chorePlayer: document.getElementById("chore-player"),
+  choreTask: document.getElementById("chore-task"),
   scorePreview: document.getElementById("score-preview"),
   scoreboard: document.getElementById("scoreboard"),
   history: document.getElementById("history"),
@@ -39,7 +69,11 @@ const elements = {
   aiResponse: document.getElementById("ai-response"),
   aiMic: document.getElementById("ai-mic"),
   micStatus: document.getElementById("mic-status"),
+  todayLabel: document.getElementById("today-label"),
 };
+
+const screens = Array.from(document.querySelectorAll(".screen"));
+const screenButtons = Array.from(document.querySelectorAll("[data-screen-target]"));
 
 let state = loadState();
 let typingStartTime = null;
@@ -78,6 +112,37 @@ function setTurn(index) {
   }
 }
 
+function getDateKey(date) {
+  return date.toISOString().split("T")[0];
+}
+
+function getWeekStart(date) {
+  const start = new Date(date);
+  const day = start.getDay();
+  const diff = (day + 6) % 7;
+  start.setDate(start.getDate() - diff);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+function getWeekDates() {
+  const start = getWeekStart(new Date());
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    return date;
+  });
+}
+
+function getTodayIndex() {
+  const day = new Date().getDay();
+  return (day + 6) % 7;
+}
+
+function updateTodayLabel() {
+  elements.todayLabel.textContent = dayLabels[getTodayIndex()];
+}
+
 function renderPlayers() {
   elements.playersList.innerHTML = "";
   state.players.forEach((player, index) => {
@@ -107,6 +172,12 @@ function renderPlayers() {
     .join("");
 }
 
+function renderTasks() {
+  elements.choreTask.innerHTML = state.tasks
+    .map((task) => `<option value="${task.id}">${task.title}</option>`)
+    .join("");
+}
+
 function renderTurn() {
   const current = getCurrentPlayer();
   elements.currentTurn.textContent = current
@@ -117,25 +188,83 @@ function renderTurn() {
 
 function renderScoreboard() {
   elements.scoreboard.innerHTML = "";
-  state.players.forEach((player) => {
-    const item = document.createElement("div");
-    item.className = "score-item";
-    item.innerHTML = `
-      <div>
-        <strong>${player.name}</strong>
-        <div class="helper">Age ${player.age} · ${formatMultiplier(player.age)}</div>
-      </div>
-      <div><strong>${player.score || 0}</strong> pts</div>
-    `;
-    elements.scoreboard.appendChild(item);
+  if (!state.tasks.length) {
+    elements.scoreboard.innerHTML =
+      '<p class="helper">No quests yet. Add one in the Chore Console.</p>';
+    return;
+  }
+
+  const categories = state.tasks.reduce((grouped, task) => {
+    grouped[task.category] = grouped[task.category] || [];
+    grouped[task.category].push(task);
+    return grouped;
+  }, {});
+
+  const weekDates = getWeekDates();
+  const todayIndex = getTodayIndex();
+
+  Object.entries(categories).forEach(([category, tasks]) => {
+    const categoryWrap = document.createElement("div");
+    categoryWrap.className = "quest-category";
+    categoryWrap.innerHTML = `<h3>${category}</h3>`;
+
+    tasks.forEach((task) => {
+      const row = document.createElement("div");
+      row.className = "quest-row";
+
+      const name = document.createElement("div");
+      name.className = "quest-name";
+      name.textContent = task.title;
+      row.appendChild(name);
+
+      let totalDue = 0;
+      let completed = 0;
+
+      weekDates.forEach((date, index) => {
+        const dayCell = document.createElement("div");
+        dayCell.className = "day-cell";
+        dayCell.textContent = dayLabels[index];
+
+        const isDue = task.days[index];
+        const dateKey = getDateKey(date);
+        const isDone = state.taskLogs.some(
+          (log) => log.taskId === task.id && log.date === dateKey
+        );
+
+        if (isDue) {
+          totalDue += 1;
+          dayCell.classList.add("is-due");
+        }
+        if (isDone) {
+          completed += 1;
+          dayCell.classList.add("is-done");
+        }
+        if (index === todayIndex) {
+          dayCell.classList.add("is-today");
+        }
+
+        row.appendChild(dayCell);
+      });
+
+      const progress = document.createElement("div");
+      progress.className = "quest-progress";
+      const percent = totalDue ? Math.round((completed / totalDue) * 100) : 0;
+      progress.textContent = `${percent}%`;
+      row.appendChild(progress);
+
+      categoryWrap.appendChild(row);
+    });
+
+    elements.scoreboard.appendChild(categoryWrap);
   });
 }
 
 function renderHistory() {
-  elements.history.innerHTML = state.history
-    .slice(0, 6)
-    .map((entry) => `<div>• ${entry}</div>`)
-    .join("") || "<div class=\"helper\">No activity yet.</div>";
+  elements.history.innerHTML =
+    state.history
+      .slice(0, 6)
+      .map((entry) => `<div>• ${entry}</div>`)
+      .join("") || '<div class="helper">No activity yet.</div>';
 }
 
 function updateScorePreview() {
@@ -167,10 +296,12 @@ function logHistory(message) {
 
 function render() {
   renderPlayers();
+  renderTasks();
   renderTurn();
   renderScoreboard();
   renderHistory();
   updateScorePreview();
+  updateTodayLabel();
 }
 
 function handleAddPlayer(event) {
@@ -200,18 +331,33 @@ function handleNextTurn() {
   renderTurn();
 }
 
+function logTaskCompletion(taskId) {
+  const todayKey = getDateKey(new Date());
+  state.taskLogs = state.taskLogs.filter(
+    (log) => !(log.taskId === taskId && log.date === todayKey)
+  );
+  state.taskLogs.push({ taskId, date: todayKey });
+}
+
 function handleChoreSubmit(event) {
   event.preventDefault();
   const playerIndex = Number(elements.chorePlayer.value);
   const player = state.players[playerIndex];
   if (!player) return;
-  const chore = String(elements.choreForm.chore.value).trim();
+  const taskId = String(elements.choreForm.task.value);
+  const task = state.tasks.find((item) => item.id === taskId);
+  if (!task) return;
+  const note = String(elements.choreForm.note.value || "").trim();
   const complexity = Number(elements.choreForm.complexity.value);
-  if (!chore) return;
 
   const points = Math.round(complexity * 10 * ageMultiplier(player.age));
   player.score = (player.score || 0) + points;
-  logHistory(`${player.name} finished "${chore}" for ${points} pts.`);
+  logTaskCompletion(taskId);
+
+  const message = note
+    ? `${player.name} cleared "${task.title}" (${note}) for ${points} pts.`
+    : `${player.name} cleared "${task.title}" for ${points} pts.`;
+  logHistory(message);
 
   elements.choreForm.reset();
   elements.choreForm.complexity.value = 3;
@@ -340,7 +486,23 @@ function startMicrophone() {
   }
 }
 
+function showScreen(targetId) {
+  screens.forEach((screen) => {
+    screen.classList.toggle("is-active", screen.id === targetId);
+  });
+}
+
+function ensureDefaults() {
+  if (!Array.isArray(state.tasks) || state.tasks.length === 0) {
+    state.tasks = [...defaultState.tasks];
+  }
+  if (!Array.isArray(state.taskLogs)) {
+    state.taskLogs = [];
+  }
+}
+
 function init() {
+  ensureDefaults();
   render();
   renderTypingPrompt();
   elements.profileForm.addEventListener("submit", handleAddPlayer);
@@ -355,6 +517,12 @@ function init() {
   elements.aiSettings.addEventListener("submit", saveAiSettings);
   elements.aiSend.addEventListener("click", handleAiSend);
   elements.aiMic.addEventListener("click", startMicrophone);
+
+  screenButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      showScreen(button.dataset.screenTarget);
+    });
+  });
 
   elements.aiSettings.apiKey.value = state.ai.apiKey || "";
   elements.aiSettings.model.value = state.ai.model || defaultState.ai.model;
