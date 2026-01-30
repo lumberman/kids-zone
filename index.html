@@ -17,95 +17,126 @@
           <span class="status-label">DAY</span>
           <strong id="today-label" class="status-value">---</strong>
         </div>
-        <button id="reset-data" class="ghost">Reset Data</button>
+        <a class="ghost button-link" href="#/settings">Settings</a>
       </div>
     </header>
 
     <main>
-      <section id="home-screen" class="screen is-active">
+      <section id="screen-main" class="screen is-active" data-route="/main" aria-labelledby="main-title">
         <div class="home-grid">
           <nav class="menu-panel" aria-label="Main menu">
             <h2>MAIN MENU</h2>
-            <button type="button" data-screen-target="profiles-screen">Player Lab</button>
-            <button type="button" data-screen-target="chores-screen">Chore Console</button>
-            <button type="button" data-screen-target="typing-screen">Typing Trainer</button>
-            <button type="button" data-screen-target="ai-screen">AI Helper</button>
+            <a href="#/players" class="menu-link">Player Lab</a>
+            <a href="#/quests" class="menu-link">Quest Catalog</a>
+            <a href="#/console" class="menu-link">Quest Console</a>
+            <a href="#/typing" class="menu-link">Typing Trainer</a>
+            <a href="#/story" class="menu-link">Story Log</a>
+            <a href="#/settings" class="menu-link">Settings</a>
           </nav>
 
-          <section class="score-panel" aria-labelledby="scoreboard-title">
+          <section class="score-panel" aria-labelledby="main-title">
             <div class="panel-header">
-              <h2 id="scoreboard-title">TODAY'S QUEST BOARD</h2>
-              <p class="helper">Quick view of what is due and already cleared.</p>
+              <h2 id="main-title">TODAY'S QUEST BOARD</h2>
+              <p class="helper">Logs and totals update each turn.</p>
             </div>
-            <div id="scoreboard" class="quest-board"></div>
+            <div id="main-scoreboard" class="quest-board"></div>
           </section>
         </div>
       </section>
 
-      <section id="profiles-screen" class="screen" aria-labelledby="profiles-title">
+      <section id="screen-players" class="screen" data-route="/players" aria-labelledby="players-title">
         <div class="screen-header">
-          <h2 id="profiles-title">Player Lab</h2>
-          <button type="button" class="ghost" data-screen-target="home-screen">Back to Main Menu</button>
+          <h2 id="players-title">Player Lab</h2>
+          <a href="#/main" class="ghost button-link">Back to Main</a>
         </div>
-        <form id="profile-form" class="stack">
+        <form id="player-form" class="stack">
           <label>
             Name
             <input type="text" name="name" required placeholder="Ava" />
           </label>
           <label>
             Age
-            <input type="number" name="age" min="3" max="18" required value="7" />
+            <input type="number" name="age" min="2" max="18" required value="7" />
           </label>
           <label>
             Avatar Color
             <input type="color" name="color" value="#6c7bff" />
           </label>
           <button type="submit">Add Player</button>
+          <p class="helper">Multipliers: ≤3 (2.2×), ≤7 (1.7×), ≤14 (1.0×).</p>
         </form>
         <div id="players-list" class="list"></div>
       </section>
 
-      <section id="chores-screen" class="screen" aria-labelledby="turns-title">
+      <section id="screen-quests" class="screen" data-route="/quests" aria-labelledby="quests-title">
         <div class="screen-header">
-          <h2 id="turns-title">Chore Console</h2>
-          <button type="button" class="ghost" data-screen-target="home-screen">Back to Main Menu</button>
+          <h2 id="quests-title">Quest Catalog</h2>
+          <a href="#/main" class="ghost button-link">Back to Main</a>
+        </div>
+        <form id="quest-form" class="stack">
+          <label>
+            Quest Title
+            <input type="text" name="title" required placeholder="Put away toys" />
+          </label>
+          <label>
+            Type
+            <select name="type">
+              <option value="chore">Chore</option>
+              <option value="learning">Learning</option>
+              <option value="kindness">Kindness</option>
+              <option value="creative">Creative</option>
+            </select>
+          </label>
+          <label>
+            Base Value
+            <input type="number" name="baseValue" min="5" max="50" value="10" />
+          </label>
+          <button type="submit">Add Quest</button>
+        </form>
+        <div id="quest-list" class="list"></div>
+      </section>
+
+      <section id="screen-console" class="screen" data-route="/console" aria-labelledby="console-title">
+        <div class="screen-header">
+          <h2 id="console-title">Quest Console</h2>
+          <a href="#/main" class="ghost button-link">Back to Main</a>
         </div>
         <div class="turn-panel">
           <div>
             <p class="label">Current Turn</p>
             <p id="current-turn" class="turn-name">Add a player to start.</p>
           </div>
-          <button id="next-turn" class="secondary">Next Turn</button>
+          <button id="advance-turn" class="secondary">Advance Turn</button>
         </div>
-        <form id="chore-form" class="stack">
+        <form id="console-form" class="stack">
           <label>
             Player
-            <select name="player" id="chore-player"></select>
+            <select name="player" id="console-player"></select>
           </label>
           <label>
             Quest
-            <select name="task" id="chore-task"></select>
+            <select name="quest" id="console-quest"></select>
+          </label>
+          <label>
+            Difficulty
+            <input type="range" name="difficulty" min="1" max="5" value="3" />
           </label>
           <label>
             Note (optional)
-            <input type="text" name="note" placeholder="Put away toys" />
-          </label>
-          <label>
-            Complexity
-            <input type="range" name="complexity" min="1" max="5" value="3" />
+            <input type="text" name="note" placeholder="done" />
           </label>
           <button type="submit">Log Quest</button>
-          <p class="helper" id="score-preview"></p>
+          <p class="helper" id="console-preview"></p>
         </form>
-        <div class="history" id="history"></div>
+        <div id="console-history" class="history"></div>
       </section>
 
-      <section id="typing-screen" class="screen" aria-labelledby="typing-title">
+      <section id="screen-typing" class="screen" data-route="/typing" aria-labelledby="typing-title">
         <div class="screen-header">
           <h2 id="typing-title">Typing Trainer</h2>
-          <button type="button" class="ghost" data-screen-target="home-screen">Back to Main Menu</button>
+          <a href="#/main" class="ghost button-link">Back to Main</a>
         </div>
-        <p class="helper">Type the prompt exactly, then submit to earn points.</p>
+        <p class="helper">Type the prompt, then submit for WPM and accuracy.</p>
         <div id="typing-prompt" class="prompt"></div>
         <form id="typing-form" class="stack">
           <textarea name="typing" rows="3" required placeholder="Start typing here..."></textarea>
@@ -113,15 +144,30 @@
           <button type="button" id="new-prompt" class="secondary">New Prompt</button>
         </form>
         <div id="typing-result" class="result"></div>
+        <div id="typing-best" class="result"></div>
       </section>
 
-      <section id="ai-screen" class="screen" aria-labelledby="ai-title">
+      <section id="screen-story" class="screen" data-route="/story" aria-labelledby="story-title">
         <div class="screen-header">
-          <h2 id="ai-title">AI Helper (Optional)</h2>
-          <button type="button" class="ghost" data-screen-target="home-screen">Back to Main Menu</button>
+          <h2 id="story-title">Story Log</h2>
+          <a href="#/main" class="ghost button-link">Back to Main</a>
         </div>
-        <p class="helper">Add your OpenRouter API key for encouragement and ideas. Stored only on this device.</p>
-        <form id="ai-settings" class="stack">
+        <div id="story-feed" class="history"></div>
+      </section>
+
+      <section id="screen-settings" class="screen" data-route="/settings" aria-labelledby="settings-title">
+        <div class="screen-header">
+          <h2 id="settings-title">Settings</h2>
+          <a href="#/main" class="ghost button-link">Back to Main</a>
+        </div>
+        <form id="settings-form" class="stack">
+          <label>
+            Enable AI (optional)
+            <select name="aiEnabled">
+              <option value="false">Off</option>
+              <option value="true">On</option>
+            </select>
+          </label>
           <label>
             OpenRouter API Key
             <input type="password" name="apiKey" placeholder="sk-or-..." />
@@ -130,20 +176,24 @@
             Model
             <input type="text" name="model" value="openai/gpt-4o-mini" />
           </label>
-          <button type="submit">Save AI Settings</button>
+          <button type="submit">Save Settings</button>
         </form>
         <div class="stack">
           <label>
-            Prompt
-            <textarea id="ai-prompt" rows="3" placeholder="Give a kind message for finishing chores."></textarea>
+            Export Data (copy JSON)
+            <textarea id="export-json" rows="6" readonly></textarea>
           </label>
-          <div class="row">
-            <button id="ai-send">Ask AI</button>
-            <button id="ai-mic" class="secondary">Use Microphone</button>
-          </div>
-          <div id="ai-response" class="result"></div>
-          <p id="mic-status" class="helper"></p>
+          <button id="refresh-export" class="secondary" type="button">Refresh Export</button>
         </div>
+        <form id="import-form" class="stack">
+          <label>
+            Import Data (paste JSON)
+            <textarea name="importJson" rows="6" placeholder="Paste JSON export here"></textarea>
+          </label>
+          <button type="submit">Import Data</button>
+        </form>
+        <button id="reset-data" class="ghost">Reset All Data</button>
+        <p class="helper">Export/import uses localStorage only. Reset wipes everything on this device.</p>
       </section>
     </main>
 
@@ -151,6 +201,18 @@
       <p>Works offline after first load. Made for Safari on older iPad minis.</p>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/ai/openrouter.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/screens/main.js"></script>
+    <script src="js/screens/players.js"></script>
+    <script src="js/screens/quests.js"></script>
+    <script src="js/screens/console.js"></script>
+    <script src="js/screens/typing.js"></script>
+    <script src="js/screens/story.js"></script>
+    <script src="js/screens/settings.js"></script>
+    <script src="js/app.js"></script>
   </body>
 </html>
