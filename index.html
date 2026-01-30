@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kids Zone</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div>
+        <h1>Kids Zone</h1>
+        <p class="subtitle">Turn-based chores, fair scoring, and mini games.</p>
+      </div>
+      <button id="reset-data" class="ghost">Reset Data</button>
+    </header>
+
+    <main class="grid">
+      <section class="card" aria-labelledby="profiles-title">
+        <h2 id="profiles-title">1) Create Profiles</h2>
+        <form id="profile-form" class="stack">
+          <label>
+            Name
+            <input type="text" name="name" required placeholder="Ava" />
+          </label>
+          <label>
+            Age
+            <input type="number" name="age" min="3" max="18" required value="7" />
+          </label>
+          <label>
+            Avatar Color
+            <input type="color" name="color" value="#6c7bff" />
+          </label>
+          <button type="submit">Add Player</button>
+        </form>
+        <div id="players-list" class="list"></div>
+      </section>
+
+      <section class="card" aria-labelledby="turns-title">
+        <h2 id="turns-title">2) Turn + Chore Report</h2>
+        <div class="turn-panel">
+          <div>
+            <p class="label">Current Turn</p>
+            <p id="current-turn" class="turn-name">Add a player to start.</p>
+          </div>
+          <button id="next-turn" class="secondary">Next Turn</button>
+        </div>
+        <form id="chore-form" class="stack">
+          <label>
+            Player
+            <select name="player" id="chore-player"></select>
+          </label>
+          <label>
+            Chore Completed
+            <input type="text" name="chore" required placeholder="Put away toys" />
+          </label>
+          <label>
+            Complexity
+            <input type="range" name="complexity" min="1" max="5" value="3" />
+          </label>
+          <button type="submit">Log Chore</button>
+          <p class="helper" id="score-preview"></p>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="scores-title">
+        <h2 id="scores-title">Scoreboard</h2>
+        <div id="scoreboard" class="scoreboard"></div>
+        <div class="history" id="history"></div>
+      </section>
+
+      <section class="card" aria-labelledby="typing-title">
+        <h2 id="typing-title">Typing Trainer</h2>
+        <p class="helper">Type the prompt exactly, then submit to earn points.</p>
+        <div id="typing-prompt" class="prompt"></div>
+        <form id="typing-form" class="stack">
+          <textarea name="typing" rows="3" required placeholder="Start typing here..."></textarea>
+          <button type="submit">Submit Typing</button>
+          <button type="button" id="new-prompt" class="secondary">New Prompt</button>
+        </form>
+        <div id="typing-result" class="result"></div>
+      </section>
+
+      <section class="card" aria-labelledby="ai-title">
+        <h2 id="ai-title">AI Helper (Optional)</h2>
+        <p class="helper">Add your OpenRouter API key for encouragement and ideas. Stored only on this device.</p>
+        <form id="ai-settings" class="stack">
+          <label>
+            OpenRouter API Key
+            <input type="password" name="apiKey" placeholder="sk-or-..." />
+          </label>
+          <label>
+            Model
+            <input type="text" name="model" value="openai/gpt-4o-mini" />
+          </label>
+          <button type="submit">Save AI Settings</button>
+        </form>
+        <div class="stack">
+          <label>
+            Prompt
+            <textarea id="ai-prompt" rows="3" placeholder="Give a kind message for finishing chores."></textarea>
+          </label>
+          <div class="row">
+            <button id="ai-send">Ask AI</button>
+            <button id="ai-mic" class="secondary">Use Microphone</button>
+          </div>
+          <div id="ai-response" class="result"></div>
+          <p id="mic-status" class="helper"></p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Works offline after first load. Made for Safari on older iPad minis.</p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
